@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Alumni Meet 2026 - Check In</title>
+
+  <!-- QR scanner library -->
+  <script src="https://unpkg.com/html5-qrcode"
+          type="text/javascript"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f1e8;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 10px 0 5px;
+      font-size: 27px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    #startButton {
+      background: #222;
+      color: white;
+    }
+
+    #stopButton {
+      background: #ddd;
+      color: #222;
+    }
+
+    #reader {
+      width: 100%;
+      margin-top: 20px;
+      overflow: hidden;
+      border-radius: 15px;
+    }
+
+    #status {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 14px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      display: none;
+    }
+
+    .success {
+      background: #d9f5df;
+      color: #17652a;
+    }
+
+    .duplicate {
+      background: #fff0c9;
+      color: #805d00;
+    }
+
+    .invalid {
+      background: #ffdede;
+      color: #9b1c1c;
+    }
+
+    .error {
+      background: #ffdede;
+      color: #9b1c1c;
+    }
+
+    .guest-name {
+      font-size: 25px;
+      margin: 8px 0;
+    }
+
+    .ticket {
+      font-size: 16px;
+      font-weight: normal;
+    }
+
+    .instructions {
+      margin-top: 18px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Alumni Meet 2026</h1>
+  <div class="subtitle">Guest Check-In</div>
+
+  <div class="card">
+
+    <label for="pin">Staff PIN</label>
+
+    <input
+      type="password"
+      id="pin"
+      placeholder="Enter staff PIN"
+      inputmode="numeric"
+      autocomplete="off"
+    >
+
+    <button id="startButton" onclick="startScanner()">
+      📷 START SCANNER
+    </button>
+
+    <button id="stopButton"
+            onclick="stopScanner()"
+            class="hidden">
+      STOP SCANNER
+    </button>
+
+    <div id="reader"></div>
+
+    <div id="status"></div>
+
+    <div class="instructions">
+      Enter the staff PIN once, then point the camera at the
+      guest's QR ticket.
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  /*************************************************
+   * YOUR APPS SCRIPT WEB APP
+   *************************************************/
+
+  const API_URL =
+    "https://script.google.com/macros/s/AKfycbwaQ3pTBOFMQyhPZBLwKuBkgqJ2uhWDUv765miG9gYZuc_t7Z0PpUnI0xXdl_R8H-U0rQ/exec";
+
+
+  let scanner = null;
+
+  let scannerRunning = false;
+
+  let processing = false;
+
+
+  /*************************************************
+   * START SCANNER
+   *************************************************/
+
+  async function startScanner() {
+
+    const pin =
+      document.getElementById("pin").value.trim();
+
+    if (!pin) {
+
+      showStatus(
+        "error",
+        "Please enter the staff PIN."
+      );
+
+      return;
+    }
+
+
+    if (scannerRunning) {
+      return;
+    }
+
+
+    clearStatus();
+
+
+    scanner =
+      new Html5Qrcode("reader");
+
+
+    try {
+
+      await scanner.start(
+
+        {
+          facingMode: "environment"
+        },
+
+        {
+          fps: 10,
+
+          qrbox: {
+            width: 250,
+            height: 250
+          },
+
+          aspectRatio: 1.0
+        },
+
+        onScanSuccess,
+
+        onScanFailure
+
+      );
+
+
+      scannerRunning = true;
+
+
+      document
+        .getElementById("startButton")
+        .classList
+        .add("hidden");
+
+
+      document
+        .getElementById("stopButton")
+        .classList
+        .remove("hidden");
+
+    }
+
+    catch (error) {
+
+      console.error(error);
+
+      showStatus(
+        "error",
+        "Camera could not be started.<br><br>" +
+        "Please make sure camera permission is allowed " +
+        "for this website and that you are using HTTPS."
+      );
+
+    }
+
+  }
+
+
+  /*************************************************
+   * QR SCANNED
+   *************************************************/
+
+  function onScanSuccess(decodedText) {
+
+    if (processing) {
+      return;
+    }
+
+
+    processing = true;
+
+
+    let ticketId =
+      String(decodedText || "")
+        .trim()
+        .toUpperCase();
+
+
+    /*
+     * Our QR contains the ticket ID directly.
+     *
+     * Example:
+     *
+     * AM26-001
+     */
+
+
+    console.log(
+      "QR detected:",
+      ticketId
+    );
+
+
+    checkTicket(ticketId);
+
+  }
+
+
+  /*************************************************
+   * QR SCAN FAILURE
+   *
+   * Ignore normal frames where no QR is detected.
+   *************************************************/
+
+  function onScanFailure(error) {
+    // Intentionally empty.
+  }
+
+
+  /*************************************************
+   * SEND TICKET TO APPS SCRIPT
+   *************************************************/
+
+  function checkTicket(ticketId) {
+
+    const pin =
+      document.getElementById("pin").value.trim();
+
+
+    const callbackName =
+      "scannerCallback_" +
+      Date.now();
+
+
+    window[callbackName] =
+      function(response) {
+
+        console.log(
+          "Server response:",
+          response
+        );
+
+
+        /*
+         * Remove callback.
+         */
+
+        try {
+          delete window[callbackName];
+        }
+
+        catch (e) {}
+
+
+        handleResponse(response);
+
+      };
+
+
+    const url =
+      API_URL +
+      "?action=checkin" +
+      "&ticket=" +
+      encodeURIComponent(ticketId) +
+      "&pin=" +
+      encodeURIComponent(pin) +
+      "&callback=" +
+      encodeURIComponent(callbackName);
+
+
+    /*
+     * JSONP request.
+     */
+
+    const script =
+      document.createElement("script");
+
+
+    script.src = url;
+
+
+    script.onerror =
+      function() {
+
+        showStatus(
+          "error",
+          "Unable to contact the check-in server."
+        );
+
+
+        processing = false;
+
+      };
+
+
+    document
+      .body
+      .appendChild(script);
+
+
+    /*
+     * Remove script shortly afterward.
+     */
+
+    setTimeout(
+      function() {
+
+        try {
+          script.remove();
+        }
+
+        catch (e) {}
+
+      },
+      10000
+    );
+
+  }
+
+
+  /*************************************************
+   * HANDLE SERVER RESPONSE
+   *************************************************/
+
+  function handleResponse(response) {
+
+    if (!response) {
+
+      showStatus(
+        "error",
+        "No response received from server."
+      );
+
+      processing = false;
+
+      return;
+    }
+
+
+    /*
+     * SUCCESS
+     */
+
+    if (
+      response.success === true &&
+      response.status === "success"
+    ) {
+
+      showStatus(
+
+        "success",
+
+        "✓ CHECK-IN SUCCESSFUL" +
+
+        "<div class='guest-name'>" +
+        escapeHtml(response.name) +
+        "</div>" +
+
+        "<div>" +
+        escapeHtml(response.batch || "") +
+        "</div>" +
+
+        "<div class='ticket'>" +
+        escapeHtml(response.ticketId) +
+        "<br>" +
+        escapeHtml(response.time || "") +
+        "</div>"
+
+      );
+
+
+      /*
+       * Allow the staff member to see
+       * the confirmation briefly.
+       */
+
+      setTimeout(
+        function() {
+
+          clearStatus();
+
+          processing = false;
+
+        },
+        2500
+      );
+
+
+      return;
+    }
+
+
+    /*
+     * DUPLICATE
+     */
+
+    if (
+      response.status === "duplicate"
+    ) {
+
+      showStatus(
+
+        "duplicate",
+
+        "⚠ ALREADY CHECKED IN" +
+
+        "<div class='guest-name'>" +
+        escapeHtml(response.name) +
+        "</div>" +
+
+        "<div>" +
+        escapeHtml(response.batch || "") +
+        "</div>" +
+
+        "<div class='ticket'>" +
+        escapeHtml(response.ticketId) +
+        "</div>"
+
+      );
+
+
+      /*
+       * Keep duplicate warning visible
+       * slightly longer.
+       */
+
+      setTimeout(
+        function() {
+
+          clearStatus();
+
+          processing = false;
+
+        },
+        3500
+      );
+
+
+      return;
+    }
+
+
+    /*
+     * INVALID
+     */
+
+    if (
+      response.status === "invalid"
+    ) {
+
+      showStatus(
+
+        "invalid",
+
+        "✕ INVALID TICKET" +
+
+        "<div class='ticket'>" +
+        escapeHtml(
+          response.ticketId || ""
+        ) +
+        "</div>"
+
+      );
+
+
+      setTimeout(
+        function() {
+
+          clearStatus();
+
+          processing = false;
+
+        },
+        3000
+      );
+
+
+      return;
+    }
+
+
+    /*
+     * ERROR
+     */
+
+    showStatus(
+
+      "error",
+
+      "⚠ ERROR" +
+
+      "<div class='ticket'>" +
+      escapeHtml(
+        response.message ||
+        "Something went wrong."
+      ) +
+      "</div>"
+
+    );
+
+
+    setTimeout(
+      function() {
+
+        clearStatus();
+
+        processing = false;
+
+      },
+      3000
+    );
+
+  }
+
+
+  /*************************************************
+   * STOP SCANNER
+   *************************************************/
+
+  async function stopScanner() {
+
+    if (
+      scanner &&
+      scannerRunning
+    ) {
+
+      try {
+
+        await scanner.stop();
+
+        scanner.clear();
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+      }
+
+    }
+
+
+    scannerRunning = false;
+
+
+    document
+      .getElementById("startButton")
+      .classList
+      .remove("hidden");
+
+
+    document
+      .getElementById("stopButton")
+      .classList
+      .add("hidden");
+
+  }
+
+
+  /*************************************************
+   * STATUS
+   *************************************************/
+
+  function showStatus(
+    type,
+    message
+  ) {
+
+    const status =
+      document.getElementById("status");
+
+
+    status.className = "";
+
+    status.classList.add(type);
+
+    status.innerHTML = message;
+
+    status.style.display = "block";
+
+  }
+
+
+  function clearStatus() {
+
+    const status =
+      document.getElementById("status");
+
+
+    status.style.display = "none";
+
+    status.innerHTML = "";
+
+    status.className = "";
+
+  }
+
+
+  /*************************************************
+   * BASIC HTML ESCAPE
+   *************************************************/
+
+  function escapeHtml(value) {
+
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+</script>
+
+</body>
+</html>
