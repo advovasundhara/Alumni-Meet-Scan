@@ -1,351 +1,277 @@
 <!DOCTYPE html>
+
 <html>
 
 <head>
 
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1"
+>
 
-  <title>
-    Alumni Meet 2026 Check-In
-  </title>
+<title>
+Alumni Meet 2026 Check-In
+</title>
 
 
-  <!--
-    QR SCANNER LIBRARY
-  -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
+<style>
 
-  <style>
+* {
+  box-sizing:border-box;
+}
 
-    * {
-      box-sizing: border-box;
-    }
 
+body {
 
-    body {
+  margin:0;
 
-      margin: 0;
+  min-height:100vh;
 
-      min-height: 100vh;
+  font-family:
+    Arial,
+    sans-serif;
 
-      font-family:
-        Arial,
-        sans-serif;
+  background:#f5f3ef;
 
-      background:
-        #f5f3ef;
+  display:flex;
 
-      color:
-        #222;
+  justify-content:center;
 
-      display:
-        flex;
+  align-items:center;
 
-      justify-content:
-        center;
+}
 
-      align-items:
-        center;
 
-    }
+.container {
 
+  width:100%;
 
-    .container {
+  max-width:500px;
 
-      width:
-        100%;
+  padding:20px;
 
-      max-width:
-        520px;
+}
 
-      padding:
-        20px;
 
-    }
+.card {
 
+  background:white;
 
-    .card {
+  padding:25px;
 
-      background:
-        white;
+  border-radius:20px;
 
-      border-radius:
-        22px;
+  box-shadow:
+    0 8px 30px
+    rgba(0,0,0,.12);
 
-      padding:
-        24px;
+  text-align:center;
 
-      box-shadow:
-        0 8px 30px
-        rgba(0,0,0,.10);
+}
 
-      text-align:
-        center;
 
-    }
+h1 {
 
+  margin:0;
 
-    h1 {
+  font-size:27px;
 
-      margin:
-        0;
+}
 
-      font-size:
-        28px;
 
-    }
+.subtitle {
 
+  margin-top:6px;
 
-    .subtitle {
+  margin-bottom:20px;
 
-      margin-top:
-        6px;
+  color:#777;
 
-      margin-bottom:
-        20px;
+}
 
-      color:
-        #777;
 
-    }
+.pin {
 
+  width:150px;
 
-    #reader {
+  padding:12px;
 
-      width:
-        100%;
+  font-size:18px;
 
-      max-width:
-        420px;
+  text-align:center;
 
-      margin:
-        auto;
+  border:1px solid #ccc;
 
-      overflow:
-        hidden;
+  border-radius:8px;
 
-      border-radius:
-        15px;
+  margin-bottom:15px;
 
-    }
+}
 
 
-    button {
+#reader {
 
-      border:
-        none;
+  width:100%;
 
-      border-radius:
-        10px;
+  max-width:420px;
 
-      padding:
-        14px 22px;
+  margin:auto;
 
-      margin:
-        10px 4px 4px;
+  overflow:hidden;
 
-      font-size:
-        16px;
+  border-radius:15px;
 
-      background:
-        #222;
+}
 
-      color:
-        white;
 
-      cursor:
-        pointer;
+button {
 
-    }
+  padding:14px 22px;
 
+  margin:10px 4px;
 
-    button:disabled {
+  border:0;
 
-      opacity:
-        .45;
+  border-radius:10px;
 
-    }
+  background:#222;
 
+  color:white;
 
-    #status {
+  font-size:16px;
 
-      margin-top:
-        15px;
+}
 
-      color:
-        #777;
 
-      min-height:
-        20px;
+button:disabled {
 
-      font-size:
-        14px;
+  opacity:.4;
 
-    }
+}
 
 
-    #result {
+#status {
 
-      display:
-        none;
+  margin-top:10px;
 
-      margin-top:
-        20px;
+  color:#777;
 
-      padding:
-        20px;
+  min-height:22px;
 
-      border-radius:
-        15px;
+}
 
-    }
 
+#result {
 
-    .success {
+  display:none;
 
-      display:
-        block !important;
+  margin-top:20px;
 
-      background:
-        #e8f7ec;
+  padding:20px;
 
-      border:
-        2px solid
-        #3aa65c;
+  border-radius:15px;
 
-    }
+}
 
 
-    .duplicate {
+.success {
 
-      display:
-        block !important;
+  display:block !important;
 
-      background:
-        #fff4d6;
+  background:#e8f7ec;
 
-      border:
-        2px solid
-        #e2a900;
+  border:2px solid #3aa65c;
 
-    }
+}
 
 
-    .invalid,
-    .error {
+.duplicate {
 
-      display:
-        block !important;
+  display:block !important;
 
-      background:
-        #fde8e8;
+  background:#fff4d6;
 
-      border:
-        2px solid
-        #d64545;
+  border:2px solid #e2a900;
 
-    }
+}
 
 
-    .icon {
+.invalid {
 
-      font-size:
-        45px;
+  display:block !important;
 
-    }
+  background:#fde8e8;
 
+  border:2px solid #d64545;
 
-    .title {
+}
 
-      font-size:
-        22px;
 
-      font-weight:
-        bold;
+.error {
 
-      margin:
-        8px 0;
+  display:block !important;
 
-    }
+  background:#fde8e8;
 
+  border:2px solid #d64545;
 
-    .name {
+}
 
-      font-size:
-        21px;
 
-      font-weight:
-        bold;
+.icon {
 
-      margin-top:
-        10px;
+  font-size:45px;
 
-    }
+}
 
 
-    .batch {
+.title {
 
-      margin-top:
-        5px;
+  font-size:21px;
 
-      color:
-        #555;
+  font-weight:bold;
 
-    }
+  margin:8px 0;
 
+}
 
-    .ticket {
 
-      margin-top:
-        8px;
+.name {
 
-      color:
-        #666;
+  font-size:21px;
 
-      font-size:
-        14px;
+  font-weight:bold;
 
-    }
+  margin-top:10px;
 
+}
 
-    .pin-area {
 
-      margin-top:
-        15px;
+.batch {
 
-    }
+  color:#555;
 
+  margin-top:5px;
 
-    .pin-area input {
+}
 
-      width:
-        140px;
 
-      padding:
-        12px;
+.ticket {
 
-      font-size:
-        18px;
+  color:#777;
 
-      text-align:
-        center;
+  margin-top:7px;
 
-      border:
-        1px solid #ccc;
+  font-size:14px;
 
-      border-radius:
-        8px;
+}
 
-    }
-
-  </style>
+</style>
 
 </head>
 
@@ -355,105 +281,99 @@
 
 <div class="container">
 
-  <div class="card">
+<div class="card">
 
 
-    <h1>
-      Alumni Meet 2026
-    </h1>
+<h1>
+Alumni Meet 2026
+</h1>
 
 
-    <div class="subtitle">
-      Guest Check-In
-    </div>
+<div class="subtitle">
+Guest Check-In
+</div>
 
 
-    <!-- STAFF PIN -->
-
-    <div class="pin-area">
-
-      <input
-        id="staffPin"
-        type="password"
-        inputmode="numeric"
-        maxlength="10"
-        placeholder="Staff PIN"
-      >
-
-    </div>
+<input
+  id="staffPin"
+  class="pin"
+  type="password"
+  inputmode="numeric"
+  placeholder="Staff PIN"
+>
 
 
-    <!-- QR SCANNER -->
-
-    <div id="reader"></div>
+<div id="reader"></div>
 
 
-    <button
-      id="startButton"
-      onclick="startScanner()"
-    >
-      Start Scanner
-    </button>
+<button
+  id="start"
+  onclick="startScanner()"
+>
+
+Start Scanner
+
+</button>
 
 
-    <button
-      id="stopButton"
-      onclick="stopScanner()"
-      disabled
-    >
-      Stop Scanner
-    </button>
+<button
+  id="stop"
+  onclick="stopScanner()"
+  disabled
+>
+
+Stop Scanner
+
+</button>
 
 
-    <!-- STATUS -->
+<div id="status">
 
-    <div id="status">
-      Enter staff PIN and start scanner.
-    </div>
+Enter PIN and start scanner.
 
-
-    <!-- RESULT -->
-
-    <div id="result">
-
-      <div
-        id="resultIcon"
-        class="icon">
-      </div>
+</div>
 
 
-      <div
-        id="resultTitle"
-        class="title">
-      </div>
+<div id="result">
 
 
-      <div
-        id="guestName"
-        class="name">
-      </div>
+<div
+  id="icon"
+  class="icon">
+</div>
 
 
-      <div
-        id="guestBatch"
-        class="batch">
-      </div>
+<div
+  id="title"
+  class="title">
+</div>
 
 
-      <div
-        id="ticket"
-        class="ticket">
-      </div>
+<div
+  id="name"
+  class="name">
+</div>
 
 
-      <div
-        id="message">
-      </div>
+<div
+  id="batch"
+  class="batch">
+</div>
 
-    </div>
+
+<div
+  id="ticket"
+  class="ticket">
+</div>
 
 
-  </div>
+<div id="message"></div>
+
+
+</div>
+
+
+</div>
 
 </div>
 
@@ -462,32 +382,20 @@
 
 
 /************************************************
- * CONFIGURATION
+ * PUT YOUR APPS SCRIPT /EXEC URL HERE
  ************************************************/
-
-
-/*
- * PUT YOUR APPS SCRIPT /EXEC URL HERE.
- *
- * Example:
- *
- * https://script.google.com/macros/s/XXXXXXXX/exec
- */
 
 const API_URL =
   'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
 
 
-let scanner =
-  null;
+let scanner = null;
 
-
-let processing =
-  false;
+let processing = false;
 
 
 /************************************************
- * START SCANNER
+ * START
  ************************************************/
 
 async function startScanner() {
@@ -502,10 +410,9 @@ async function startScanner() {
 
   if (!pin) {
 
-    document
-      .getElementById('status')
-      .textContent =
-        'Please enter the staff PIN.';
+    setStatus(
+      'Please enter the staff PIN.'
+    );
 
     return;
 
@@ -517,10 +424,9 @@ async function startScanner() {
     'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE'
   ) {
 
-    document
-      .getElementById('status')
-      .textContent =
-        'Scanner API URL has not been configured.';
+    setStatus(
+      'Scanner API URL has not been configured.'
+    );
 
     return;
 
@@ -528,21 +434,18 @@ async function startScanner() {
 
 
   if (scanner) {
+
     return;
+
   }
 
 
-  const status =
-    document
-      .getElementById('status');
-
-
-  status.textContent =
-    'Starting camera...';
+  setStatus(
+    'Starting camera...'
+  );
 
 
   try {
-
 
     scanner =
       new Html5Qrcode(
@@ -557,71 +460,53 @@ async function startScanner() {
           'environment'
       },
 
-
       {
 
-        fps:
-          10,
+        fps:10,
 
-        qrbox:
-          {
-            width:
-              250,
-
-            height:
-              250
-          }
+        qrbox:{
+          width:250,
+          height:250
+        }
 
       },
 
-
       onScanSuccess,
 
-
-      onScanFailure
+      function() {}
 
     );
 
 
     document
-      .getElementById(
-        'startButton'
-      )
-      .disabled =
-        true;
+      .getElementById('start')
+      .disabled = true;
 
 
     document
-      .getElementById(
-        'stopButton'
-      )
-      .disabled =
-        false;
+      .getElementById('stop')
+      .disabled = false;
 
 
-    status.textContent =
-      'Ready to scan.';
-
+    setStatus(
+      'Ready to scan.'
+    );
 
   }
 
-  catch (error) {
+  catch(error) {
 
-    console.error(
-      error
-    );
+    console.error(error);
 
+    scanner = null;
 
-    scanner =
-      null;
-
-
-    status.textContent =
+    setStatus(
       'Camera error: ' +
       (
         error.message ||
         error
-      );
+      )
+    );
 
   }
 
@@ -629,21 +514,7 @@ async function startScanner() {
 
 
 /************************************************
- * QR FAILURE
- ************************************************/
-
-function onScanFailure(error) {
-
-  /*
-   * Normal while searching
-   * for a QR code.
-   */
-
-}
-
-
-/************************************************
- * QR SUCCESS
+ * SCAN SUCCESS
  ************************************************/
 
 function onScanSuccess(
@@ -652,12 +523,13 @@ function onScanSuccess(
 
 
   if (processing) {
+
     return;
+
   }
 
 
-  processing =
-    true;
+  processing = true;
 
 
   const ticketId =
@@ -673,31 +545,22 @@ function onScanSuccess(
       .trim();
 
 
-  document
-    .getElementById('status')
-    .textContent =
-      'Checking ' +
-      ticketId +
-      '...';
+  setStatus(
+    'Checking ' +
+    ticketId +
+    '...'
+  );
 
-
-  /*
-   * Stop scanning temporarily.
-   */
 
   stopScanner();
 
 
-  /*
-   * Create JSONP callback.
-   */
-
-  const callbackName =
+  const callback =
     'scannerCallback_' +
     Date.now();
 
 
-  window[callbackName] =
+  window[callback] =
     function(result) {
 
       handleResult(
@@ -706,15 +569,11 @@ function onScanSuccess(
 
 
       delete window[
-        callbackName
+        callback
       ];
 
     };
 
-
-  /*
-   * Build API URL.
-   */
 
   const url =
     API_URL +
@@ -728,15 +587,8 @@ function onScanSuccess(
       pin
     ) +
     '&callback=' +
-    callbackName;
+    callback;
 
-
-  /*
-   * Use a script tag.
-   *
-   * This avoids browser
-   * cross-origin restrictions.
-   */
 
   const script =
     document.createElement(
@@ -753,31 +605,27 @@ function onScanSuccess(
 
       handleResult({
 
-        success:
-          false,
+        success:false,
 
-        status:
-          'error',
+        status:'error',
 
         message:
-          'Could not connect to the check-in server.'
+          'Could not connect to check-in server.'
 
       });
 
     };
 
 
-  document
-    .body
-    .appendChild(
-      script
-    );
+  document.body.appendChild(
+    script
+  );
 
 }
 
 
 /************************************************
- * HANDLE RESULT
+ * RESULT
  ************************************************/
 
 function handleResult(
@@ -786,14 +634,12 @@ function handleResult(
 
 
   const box =
-    document
-      .getElementById(
-        'result'
-      );
+    document.getElementById(
+      'result'
+    );
 
 
-  box.className =
-    '';
+  box.className = '';
 
 
   if (
@@ -801,185 +647,141 @@ function handleResult(
     'success'
   ) {
 
-
     box.classList.add(
       'success'
     );
 
 
-    document
-      .getElementById(
-        'resultIcon'
-      )
-      .textContent =
-        '✓';
+    document.getElementById(
+      'icon'
+    ).textContent = '✓';
 
 
-    document
-      .getElementById(
-        'resultTitle'
-      )
-      .textContent =
-        'CHECK-IN SUCCESSFUL';
+    document.getElementById(
+      'title'
+    ).textContent =
+      'CHECK-IN SUCCESSFUL';
 
 
-    document
-      .getElementById(
-        'guestName'
-      )
-      .textContent =
-        result.name;
+    document.getElementById(
+      'name'
+    ).textContent =
+      result.name || '';
 
 
-    document
-      .getElementById(
-        'guestBatch'
-      )
-      .textContent =
-        'Batch: ' +
-        result.batch;
+    document.getElementById(
+      'batch'
+    ).textContent =
+      'Batch: ' +
+      (result.batch || '');
 
 
-    document
-      .getElementById(
-        'ticket'
-      )
-      .textContent =
-        'Ticket: ' +
-        result.ticketId;
+    document.getElementById(
+      'ticket'
+    ).textContent =
+      'Ticket: ' +
+      result.ticketId;
 
 
-    document
-      .getElementById(
-        'message'
-      )
-      .textContent =
-        result.message;
+    document.getElementById(
+      'message'
+    ).textContent =
+      result.message;
 
 
   }
-
 
   else if (
     result.status ===
     'duplicate'
   ) {
 
-
     box.classList.add(
       'duplicate'
     );
 
 
-    document
-      .getElementById(
-        'resultIcon'
-      )
-      .textContent =
-        '⚠️';
+    document.getElementById(
+      'icon'
+    ).textContent = '⚠️';
 
 
-    document
-      .getElementById(
-        'resultTitle'
-      )
-      .textContent =
-        'ALREADY CHECKED IN';
+    document.getElementById(
+      'title'
+    ).textContent =
+      'ALREADY CHECKED IN';
 
 
-    document
-      .getElementById(
-        'guestName'
-      )
-      .textContent =
-        result.name;
+    document.getElementById(
+      'name'
+    ).textContent =
+      result.name || '';
 
 
-    document
-      .getElementById(
-        'guestBatch'
-      )
-      .textContent =
-        'Batch: ' +
-        result.batch;
+    document.getElementById(
+      'batch'
+    ).textContent =
+      'Batch: ' +
+      (result.batch || '');
 
 
-    document
-      .getElementById(
-        'ticket'
-      )
-      .textContent =
-        'Ticket: ' +
-        result.ticketId;
+    document.getElementById(
+      'ticket'
+    ).textContent =
+      'Ticket: ' +
+      result.ticketId;
 
 
-    document
-      .getElementById(
-        'message'
-      )
-      .textContent =
-        result.message;
+    document.getElementById(
+      'message'
+    ).textContent =
+      result.message;
 
 
   }
 
-
   else {
 
-
     box.classList.add(
-      'invalid'
+      result.status ===
+      'error'
+        ? 'error'
+        : 'invalid'
     );
 
 
-    document
-      .getElementById(
-        'resultIcon'
-      )
-      .textContent =
-        '✕';
+    document.getElementById(
+      'icon'
+    ).textContent = '✕';
 
 
-    document
-      .getElementById(
-        'resultTitle'
-      )
-      .textContent =
-        'CHECK-IN FAILED';
+    document.getElementById(
+      'title'
+    ).textContent =
+      'CHECK-IN FAILED';
 
 
-    document
-      .getElementById(
-        'guestName'
-      )
-      .textContent =
-        '';
+    document.getElementById(
+      'name'
+    ).textContent = '';
 
 
-    document
-      .getElementById(
-        'guestBatch'
-      )
-      .textContent =
-        '';
+    document.getElementById(
+      'batch'
+    ).textContent = '';
 
 
-    document
-      .getElementById(
-        'ticket'
-      )
-      .textContent =
-        result.ticketId ||
-        '';
+    document.getElementById(
+      'ticket'
+    ).textContent =
+      result.ticketId || '';
 
 
-    document
-      .getElementById(
-        'message'
-      )
-      .textContent =
-        result.message ||
-        'Unknown error.';
+    document.getElementById(
+      'message'
+    ).textContent =
+      result.message ||
+      'Unknown error.';
 
   }
 
@@ -988,24 +790,15 @@ function handleResult(
     'block';
 
 
-  document
-    .getElementById(
-      'status'
-    )
-    .textContent =
-      'Ready for next guest.';
+  setStatus(
+    'Ready for next guest.'
+  );
 
-
-  /*
-   * Allow another scan
-   * after a short delay.
-   */
 
   setTimeout(
     function() {
 
-      processing =
-        false;
+      processing = false;
 
     },
     1500
@@ -1015,14 +808,16 @@ function handleResult(
 
 
 /************************************************
- * STOP SCANNER
+ * STOP
  ************************************************/
 
 async function stopScanner() {
 
 
   if (!scanner) {
+
     return;
+
   }
 
 
@@ -1030,44 +825,49 @@ async function stopScanner() {
 
     await scanner.stop();
 
-
     await scanner.clear();
 
-
   }
 
-  catch (error) {
+  catch(error) {
 
-    console.log(
-      error
-    );
+    console.log(error);
 
   }
 
 
-  scanner =
-    null;
+  scanner = null;
 
 
   document
-    .getElementById(
-      'startButton'
-    )
-    .disabled =
-      false;
+    .getElementById('start')
+    .disabled = false;
 
 
   document
-    .getElementById(
-      'stopButton'
-    )
-    .disabled =
-      true;
+    .getElementById('stop')
+    .disabled = true;
 
 }
 
 
+/************************************************
+ * STATUS
+ ************************************************/
+
+function setStatus(
+  text
+) {
+
+  document
+    .getElementById('status')
+    .textContent =
+      text;
+
+}
+
 </script>
+
 
 </body>
 
