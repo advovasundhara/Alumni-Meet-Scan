@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Alumni Meet 2026 Check-In
+  </title>
+
+
+  <!--
+    QR SCANNER LIBRARY
+  -->
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    body {
+
+      margin: 0;
+
+      min-height: 100vh;
+
+      font-family:
+        Arial,
+        sans-serif;
+
+      background:
+        #f5f3ef;
+
+      color:
+        #222;
+
+      display:
+        flex;
+
+      justify-content:
+        center;
+
+      align-items:
+        center;
+
+    }
+
+
+    .container {
+
+      width:
+        100%;
+
+      max-width:
+        520px;
+
+      padding:
+        20px;
+
+    }
+
+
+    .card {
+
+      background:
+        white;
+
+      border-radius:
+        22px;
+
+      padding:
+        24px;
+
+      box-shadow:
+        0 8px 30px
+        rgba(0,0,0,.10);
+
+      text-align:
+        center;
+
+    }
+
+
+    h1 {
+
+      margin:
+        0;
+
+      font-size:
+        28px;
+
+    }
+
+
+    .subtitle {
+
+      margin-top:
+        6px;
+
+      margin-bottom:
+        20px;
+
+      color:
+        #777;
+
+    }
+
+
+    #reader {
+
+      width:
+        100%;
+
+      max-width:
+        420px;
+
+      margin:
+        auto;
+
+      overflow:
+        hidden;
+
+      border-radius:
+        15px;
+
+    }
+
+
+    button {
+
+      border:
+        none;
+
+      border-radius:
+        10px;
+
+      padding:
+        14px 22px;
+
+      margin:
+        10px 4px 4px;
+
+      font-size:
+        16px;
+
+      background:
+        #222;
+
+      color:
+        white;
+
+      cursor:
+        pointer;
+
+    }
+
+
+    button:disabled {
+
+      opacity:
+        .45;
+
+    }
+
+
+    #status {
+
+      margin-top:
+        15px;
+
+      color:
+        #777;
+
+      min-height:
+        20px;
+
+      font-size:
+        14px;
+
+    }
+
+
+    #result {
+
+      display:
+        none;
+
+      margin-top:
+        20px;
+
+      padding:
+        20px;
+
+      border-radius:
+        15px;
+
+    }
+
+
+    .success {
+
+      display:
+        block !important;
+
+      background:
+        #e8f7ec;
+
+      border:
+        2px solid
+        #3aa65c;
+
+    }
+
+
+    .duplicate {
+
+      display:
+        block !important;
+
+      background:
+        #fff4d6;
+
+      border:
+        2px solid
+        #e2a900;
+
+    }
+
+
+    .invalid,
+    .error {
+
+      display:
+        block !important;
+
+      background:
+        #fde8e8;
+
+      border:
+        2px solid
+        #d64545;
+
+    }
+
+
+    .icon {
+
+      font-size:
+        45px;
+
+    }
+
+
+    .title {
+
+      font-size:
+        22px;
+
+      font-weight:
+        bold;
+
+      margin:
+        8px 0;
+
+    }
+
+
+    .name {
+
+      font-size:
+        21px;
+
+      font-weight:
+        bold;
+
+      margin-top:
+        10px;
+
+    }
+
+
+    .batch {
+
+      margin-top:
+        5px;
+
+      color:
+        #555;
+
+    }
+
+
+    .ticket {
+
+      margin-top:
+        8px;
+
+      color:
+        #666;
+
+      font-size:
+        14px;
+
+    }
+
+
+    .pin-area {
+
+      margin-top:
+        15px;
+
+    }
+
+
+    .pin-area input {
+
+      width:
+        140px;
+
+      padding:
+        12px;
+
+      font-size:
+        18px;
+
+      text-align:
+        center;
+
+      border:
+        1px solid #ccc;
+
+      border-radius:
+        8px;
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+  <div class="card">
+
+
+    <h1>
+      Alumni Meet 2026
+    </h1>
+
+
+    <div class="subtitle">
+      Guest Check-In
+    </div>
+
+
+    <!-- STAFF PIN -->
+
+    <div class="pin-area">
+
+      <input
+        id="staffPin"
+        type="password"
+        inputmode="numeric"
+        maxlength="10"
+        placeholder="Staff PIN"
+      >
+
+    </div>
+
+
+    <!-- QR SCANNER -->
+
+    <div id="reader"></div>
+
+
+    <button
+      id="startButton"
+      onclick="startScanner()"
+    >
+      Start Scanner
+    </button>
+
+
+    <button
+      id="stopButton"
+      onclick="stopScanner()"
+      disabled
+    >
+      Stop Scanner
+    </button>
+
+
+    <!-- STATUS -->
+
+    <div id="status">
+      Enter staff PIN and start scanner.
+    </div>
+
+
+    <!-- RESULT -->
+
+    <div id="result">
+
+      <div
+        id="resultIcon"
+        class="icon">
+      </div>
+
+
+      <div
+        id="resultTitle"
+        class="title">
+      </div>
+
+
+      <div
+        id="guestName"
+        class="name">
+      </div>
+
+
+      <div
+        id="guestBatch"
+        class="batch">
+      </div>
+
+
+      <div
+        id="ticket"
+        class="ticket">
+      </div>
+
+
+      <div
+        id="message">
+      </div>
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+<script>
+
+
+/************************************************
+ * CONFIGURATION
+ ************************************************/
+
+
+/*
+ * PUT YOUR APPS SCRIPT /EXEC URL HERE.
+ *
+ * Example:
+ *
+ * https://script.google.com/macros/s/XXXXXXXX/exec
+ */
+
+const API_URL =
+  'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
+
+
+let scanner =
+  null;
+
+
+let processing =
+  false;
+
+
+/************************************************
+ * START SCANNER
+ ************************************************/
+
+async function startScanner() {
+
+
+  const pin =
+    document
+      .getElementById('staffPin')
+      .value
+      .trim();
+
+
+  if (!pin) {
+
+    document
+      .getElementById('status')
+      .textContent =
+        'Please enter the staff PIN.';
+
+    return;
+
+  }
+
+
+  if (
+    API_URL ===
+    'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE'
+  ) {
+
+    document
+      .getElementById('status')
+      .textContent =
+        'Scanner API URL has not been configured.';
+
+    return;
+
+  }
+
+
+  if (scanner) {
+    return;
+  }
+
+
+  const status =
+    document
+      .getElementById('status');
+
+
+  status.textContent =
+    'Starting camera...';
+
+
+  try {
+
+
+    scanner =
+      new Html5Qrcode(
+        'reader'
+      );
+
+
+    await scanner.start(
+
+      {
+        facingMode:
+          'environment'
+      },
+
+
+      {
+
+        fps:
+          10,
+
+        qrbox:
+          {
+            width:
+              250,
+
+            height:
+              250
+          }
+
+      },
+
+
+      onScanSuccess,
+
+
+      onScanFailure
+
+    );
+
+
+    document
+      .getElementById(
+        'startButton'
+      )
+      .disabled =
+        true;
+
+
+    document
+      .getElementById(
+        'stopButton'
+      )
+      .disabled =
+        false;
+
+
+    status.textContent =
+      'Ready to scan.';
+
+
+  }
+
+  catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    scanner =
+      null;
+
+
+    status.textContent =
+      'Camera error: ' +
+      (
+        error.message ||
+        error
+      );
+
+  }
+
+}
+
+
+/************************************************
+ * QR FAILURE
+ ************************************************/
+
+function onScanFailure(error) {
+
+  /*
+   * Normal while searching
+   * for a QR code.
+   */
+
+}
+
+
+/************************************************
+ * QR SUCCESS
+ ************************************************/
+
+function onScanSuccess(
+  decodedText
+) {
+
+
+  if (processing) {
+    return;
+  }
+
+
+  processing =
+    true;
+
+
+  const ticketId =
+    String(decodedText)
+      .trim()
+      .toUpperCase();
+
+
+  const pin =
+    document
+      .getElementById('staffPin')
+      .value
+      .trim();
+
+
+  document
+    .getElementById('status')
+    .textContent =
+      'Checking ' +
+      ticketId +
+      '...';
+
+
+  /*
+   * Stop scanning temporarily.
+   */
+
+  stopScanner();
+
+
+  /*
+   * Create JSONP callback.
+   */
+
+  const callbackName =
+    'scannerCallback_' +
+    Date.now();
+
+
+  window[callbackName] =
+    function(result) {
+
+      handleResult(
+        result
+      );
+
+
+      delete window[
+        callbackName
+      ];
+
+    };
+
+
+  /*
+   * Build API URL.
+   */
+
+  const url =
+    API_URL +
+    '?action=checkin' +
+    '&ticket=' +
+    encodeURIComponent(
+      ticketId
+    ) +
+    '&pin=' +
+    encodeURIComponent(
+      pin
+    ) +
+    '&callback=' +
+    callbackName;
+
+
+  /*
+   * Use a script tag.
+   *
+   * This avoids browser
+   * cross-origin restrictions.
+   */
+
+  const script =
+    document.createElement(
+      'script'
+    );
+
+
+  script.src =
+    url;
+
+
+  script.onerror =
+    function() {
+
+      handleResult({
+
+        success:
+          false,
+
+        status:
+          'error',
+
+        message:
+          'Could not connect to the check-in server.'
+
+      });
+
+    };
+
+
+  document
+    .body
+    .appendChild(
+      script
+    );
+
+}
+
+
+/************************************************
+ * HANDLE RESULT
+ ************************************************/
+
+function handleResult(
+  result
+) {
+
+
+  const box =
+    document
+      .getElementById(
+        'result'
+      );
+
+
+  box.className =
+    '';
+
+
+  if (
+    result.status ===
+    'success'
+  ) {
+
+
+    box.classList.add(
+      'success'
+    );
+
+
+    document
+      .getElementById(
+        'resultIcon'
+      )
+      .textContent =
+        '✓';
+
+
+    document
+      .getElementById(
+        'resultTitle'
+      )
+      .textContent =
+        'CHECK-IN SUCCESSFUL';
+
+
+    document
+      .getElementById(
+        'guestName'
+      )
+      .textContent =
+        result.name;
+
+
+    document
+      .getElementById(
+        'guestBatch'
+      )
+      .textContent =
+        'Batch: ' +
+        result.batch;
+
+
+    document
+      .getElementById(
+        'ticket'
+      )
+      .textContent =
+        'Ticket: ' +
+        result.ticketId;
+
+
+    document
+      .getElementById(
+        'message'
+      )
+      .textContent =
+        result.message;
+
+
+  }
+
+
+  else if (
+    result.status ===
+    'duplicate'
+  ) {
+
+
+    box.classList.add(
+      'duplicate'
+    );
+
+
+    document
+      .getElementById(
+        'resultIcon'
+      )
+      .textContent =
+        '⚠️';
+
+
+    document
+      .getElementById(
+        'resultTitle'
+      )
+      .textContent =
+        'ALREADY CHECKED IN';
+
+
+    document
+      .getElementById(
+        'guestName'
+      )
+      .textContent =
+        result.name;
+
+
+    document
+      .getElementById(
+        'guestBatch'
+      )
+      .textContent =
+        'Batch: ' +
+        result.batch;
+
+
+    document
+      .getElementById(
+        'ticket'
+      )
+      .textContent =
+        'Ticket: ' +
+        result.ticketId;
+
+
+    document
+      .getElementById(
+        'message'
+      )
+      .textContent =
+        result.message;
+
+
+  }
+
+
+  else {
+
+
+    box.classList.add(
+      'invalid'
+    );
+
+
+    document
+      .getElementById(
+        'resultIcon'
+      )
+      .textContent =
+        '✕';
+
+
+    document
+      .getElementById(
+        'resultTitle'
+      )
+      .textContent =
+        'CHECK-IN FAILED';
+
+
+    document
+      .getElementById(
+        'guestName'
+      )
+      .textContent =
+        '';
+
+
+    document
+      .getElementById(
+        'guestBatch'
+      )
+      .textContent =
+        '';
+
+
+    document
+      .getElementById(
+        'ticket'
+      )
+      .textContent =
+        result.ticketId ||
+        '';
+
+
+    document
+      .getElementById(
+        'message'
+      )
+      .textContent =
+        result.message ||
+        'Unknown error.';
+
+  }
+
+
+  box.style.display =
+    'block';
+
+
+  document
+    .getElementById(
+      'status'
+    )
+    .textContent =
+      'Ready for next guest.';
+
+
+  /*
+   * Allow another scan
+   * after a short delay.
+   */
+
+  setTimeout(
+    function() {
+
+      processing =
+        false;
+
+    },
+    1500
+  );
+
+}
+
+
+/************************************************
+ * STOP SCANNER
+ ************************************************/
+
+async function stopScanner() {
+
+
+  if (!scanner) {
+    return;
+  }
+
+
+  try {
+
+    await scanner.stop();
+
+
+    await scanner.clear();
+
+
+  }
+
+  catch (error) {
+
+    console.log(
+      error
+    );
+
+  }
+
+
+  scanner =
+    null;
+
+
+  document
+    .getElementById(
+      'startButton'
+    )
+    .disabled =
+      false;
+
+
+  document
+    .getElementById(
+      'stopButton'
+    )
+    .disabled =
+      true;
+
+}
+
+
+</script>
+
+</body>
+
+</html>
